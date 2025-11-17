@@ -23,6 +23,7 @@ Hotel contact information
 It demonstrates core concepts of web development, databases, CRUD operations, triggers, stored procedures, and functions.
 
 🚀 Features
+
 ✅ Guest Management
 
 Add, update, delete guest information
@@ -63,37 +64,33 @@ Different admins for each hotel
 
 Responsive HTML UI built with:
 
-HTML
+-HTML
 
-CSS
+-CSS
 
-Jinja templating
-
-Bootstrap (optional)
+-Jinja templating
 
 🛠️ Tech Stack
 Backend:
 
-Python 3.x
+-Python 3.x
 
-Flask Framework
+-Flask Framework
 
 Database:
 
-MySQL
+-MySQL
 
-SQL Stored Procedures
+-SQL Stored Procedures
 
-SQL Functions
+-SQL Functions
 
-SQL Triggers
+-SQL Triggers
 
 Frontend:
 
-HTML
+-HTML
 
-CSS
+-CSS
 
-Bootstrap
-
-Jinja2 Templates
+-Jinja2 Templates
