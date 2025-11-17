@@ -4,7 +4,7 @@ A database-driven hotel booking and management application using MySQL + Flask +
 Overview
 
 The Hotel Reservation System is a backend driven application that automates hotel booking, room allocation, guest management, and payment tracking.
-It eliminates the inefficiencies of manual reservation processes such as double booking, inaccurate records, and scattered data—by providing a centralized and real-time management platform.
+It eliminates the inefficiencies of manual reservation processes such as double booking, inaccurate records, and scattered data-by providing a centralized and real-time management platform.
 The system uses MySQL for the database and Flask (Python) with HTML for the user interface.
 It also implements core DBMS concepts such as ER modeling, relational schema, DDL/DML queries, triggers, functions, and stored procedures.
 
