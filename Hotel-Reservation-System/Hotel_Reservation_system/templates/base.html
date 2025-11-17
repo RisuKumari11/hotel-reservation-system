@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Hotel Management{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0e1117;
+            color: #c9d1d9;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #161b22;
+            padding: 20px;
+            border-right: 1px solid #30363d;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            color: #58a6ff;
+        }
+        
+        .logo {
+            font-size: 2.5em;
+        }
+        
+        .admin-badge {
+            background-color: #238636;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            background-color: #0d1117;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #30363d;
+        }
+        
+        .user-info strong {
+            color: #58a6ff;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #30363d;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #8b949e;
+            font-size: 1em;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #58a6ff;
+        }
+        
+        .tab.active {
+            color: #58a6ff;
+            border-bottom-color: #58a6ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c9d1d9;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: #0d1117;
+            border: 2px solid #30363d;
+            color: #c9d1d9;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
+        }
+        
+        /* Date input styling */
+        input[type="date"] {
+            padding: 12px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            border-radius: 4px;
+            margin-right: 2px;
+            opacity: 0.6;
+            filter: invert(1);
+        }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+        
+        button {
+            background-color: #238636;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2ea043;
+        }
+        
+        .btn-danger {
+            background-color: #da3633;
+        }
+        
+        .btn-danger:hover {
+            background-color: #f85149;
+        }
+        
+        .btn-cancel {
+            background-color: #da3633;
+        }
+        
+        .logout-btn {
+            background-color: #da3633;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .card {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .reservation-card {
+            border-left: 4px solid #58a6ff;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .table th {
+            background-color: #161b22;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #30363d;
+            color: #58a6ff;
+        }
+        
+        .table td {
+            padding: 12px;
+            border: 1px solid #30363d;
+        }
+        
+        .table tr:hover {
+            background-color: #161b22;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .status-booked {
+            background-color: #238636;
+            color: white;
+        }
+        
+        .status-available {
+            background-color: #0969da;
+            color: white;
+        }
+        
+        .status-cancelled {
+            background-color: #da3633;
+            color: white;
+        }
+        
+        .info-box {
+            background-color: #0969da;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .grid-item {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .grid-item strong {
+            display: block;
+            color: #58a6ff;
+            margin-bottom: 5px;
+        }
+        
+        h2 {
+            color: #58a6ff;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}{% endblock %}
+</body>
+</html>

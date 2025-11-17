@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hotel Management - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0e1117 0%, #161b22 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #c9d1d9;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #0d1117;
+            padding: 40px;
+            border-radius: 10px;
+            border: 1px solid #30363d;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-header h1 {
+            font-size: 2.5em;
+            color: #58a6ff;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c9d1d9;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #238636;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2ea043;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #30363d;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #58a6ff;
+        }
+        
+        .tab.active {
+            color: #58a6ff;
+            border-bottom-color: #58a6ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .error {
+            background-color: #da3633;
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">🏨</div>
+            <h1>Hotel Management</h1>
+        </div>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('guest')">Guest</button>
+            <button class="tab" onclick="switchTab('admin')">Admin</button>
+        </div>
+        
+        <!-- GUEST LOGIN -->
+        <div id="guest" class="tab-content active">
+            <form method="POST">
+                <input type="hidden" name="login_type" value="guest">
+                
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" name="guest_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" name="guest_email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="guest_phone">
+                </div>
+                
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="guest_city">
+                </div>
+                
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" name="guest_state">
+                </div>
+                
+                <button type="submit">Continue as Guest</button>
+            </form>
+        </div>
+        
+        <!-- ADMIN LOGIN -->
+        <div id="admin" class="tab-content">
+            <form method="POST">
+                <input type="hidden" name="login_type" value="admin">
+                
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="admin_user" placeholder="e.g., admin_taj" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="admin_pass" required>
+                </div>
+                
+                <button type="submit">Admin Login</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

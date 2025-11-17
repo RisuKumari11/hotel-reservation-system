@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Guest Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="sidebar">
+        <div class="user-info">
+            <strong>{{ username }}</strong>
+        </div>
+        <a href="{{ url_for('logout') }}"><button class="logout-btn">Logout</button></a>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <span class="logo">🏨</span>
+            <h1>Welcome, {{ username }}!</h1>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('book')">Book Room</button>
+            <button class="tab" onclick="switchTab('reservations')">My Reservations</button>
+            <button class="tab" onclick="switchTab('payment')">Make Payment</button>
+        </div>
+        
+        <!-- ===== BOOK ROOM TAB ===== -->
+        <div id="book" class="tab-content active">
+            <h2>Book a Room</h2>
+            <form method="POST" action="{{ url_for('book_room_route') }}">
+                <div class="form-group">
+                    <label>Select Hotel *</label>
+                    <select name="hotel_id" onchange="loadRooms(this.value)" required>
+                        <option value="">Choose a hotel...</option>
+                        {% for hotel in hotels %}
+                        <option value="{{ hotel.h_id }}">{{ hotel.h_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Room *</label>
+                    <select name="room_id" id="room-select" required>
+                        <option value="">Select hotel first...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Check-in Date *</label>
+                    <input type="date" name="checkin_date" id="checkin_date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Check-out Date *</label>
+                    <input type="date" name="checkout_date" id="checkout_date" required>
+                </div>
+                
+                <button type="submit">Book Room</button>
+            </form>
+        </div>
+        
+        <!-- ===== MY RESERVATIONS TAB ===== -->
+        <div id="reservations" class="tab-content">
+            <h2>My Reservations</h2>
+            {% if reservations %}
+                {% for res in reservations %}
+                <div class="card reservation-card">
+                    <div class="grid">
+                        <div class="grid-item">
+                            <strong>Reservation ID</strong>
+                            {{ res.reservation_id }}
+                        </div>
+                        <div class="grid-item">
+                            <strong>Hotel</strong>
+                            {{ res.h_name or 'N/A' }}
+                        </div>
+                        <div class="grid-item">
+                            <strong>Room</strong>
+                            {{ res.r_number or 'N/A' }}
+                        </div>
+                        <div class="grid-item">
+                            <strong>Check-in</strong>
+                            {{ res.check_in_date }}
+                        </div>
+                        <div class="grid-item">
+                            <strong>Check-out</strong>
+                            {{ res.check_out_date }}
+                        </div>
+                        <div class="grid-item">
+                            <strong>Status</strong>
+                            <span class="status-badge {% if res.reservation_status == 'Booked' %}status-booked{% else %}status-cancelled{% endif %}">
+                                {{ res.reservation_status }}
+                            </span>
+                        </div>
+                    </div>
+                    {% if res.reservation_status == 'Booked' %}
+                    <form method="POST" action="{{ url_for('cancel_reservation_route', res_id=res.reservation_id) }}" style="margin-top: 15px;">
+                        <button type="submit" class="btn-danger">Cancel Reservation</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="info-box">No reservations yet</div>
+            {% endif %}
+        </div>
+        
+        <!-- ===== MAKE PAYMENT TAB ===== -->
+        <div id="payment" class="tab-content">
+            <h2>Make Payment</h2>
+            {% if reservations %}
+                <form method="POST" action="{{ url_for('make_payment') }}">
+                    <div class="form-group">
+                        <label>Select Reservation to Pay *</label>
+                        <select id="reservation-select" onchange="showPaymentAmount()" required>
+                            <option value="">Choose a reservation...</option>
+                            {% for res in reservations %}
+                            {% if res.reservation_status == 'Booked' %}
+                            <option value="{{ res.reservation_id }}" 
+                                    data-checkin="{{ res.check_in_date }}"
+                                    data-checkout="{{ res.check_out_date }}">
+                                Reservation {{ res.reservation_id }} - Room {{ res.r_number }} ({{ res.check_in_date }} to {{ res.check_out_date }})
+                            </option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #58a6ff; font-weight: bold; font-size: 1.2em;">Total Amount to Pay</label>
+                        <div style="background-color: #0d1117; font-weight: bold; font-size: 3em; color: #58a6ff; padding: 40px; border: 4px solid #58a6ff; border-radius: 10px; text-align: center; margin: 20px 0;" id="display_amount">
+                            ₹ 0
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="reservation_id" id="hidden_reservation_id">
+                    <input type="hidden" name="amount" id="hidden_amount">
+                    
+                    <div class="form-group">
+                        <label>Payment Method *</label>
+                        <select name="method" required>
+                            <option value="">Select payment method...</option>
+                            <option value="Card">💳 Card</option>
+                            <option value="Net Banking">🏦 Net Banking</option>
+                            <option value="UPI">📱 UPI</option>
+                            <option value="Cash">💵 Cash</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" style="width: 100%; padding: 15px; font-size: 1.2em; font-weight: bold;">Process Payment</button>
+                </form>
+            {% else %}
+            <div class="info-box">No booked reservations available for payment</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tab).classList.add('active');
+        event.target.classList.add('active');
+    }
+    
+    function loadRooms(hotelId) {
+        if (!hotelId) {
+            document.getElementById('room-select').innerHTML = '<option value="">Select hotel first...</option>';
+            return;
+        }
+        
+        fetch(`/api/available-rooms/${hotelId}`)
+            .then(response => response.json())
+            .then(data => {
+                let options = '<option value="">Choose a room...</option>';
+                data.forEach(room => {
+                    options += `<option value="${room.r_id}">${room.r_number} - ${room.room_name} (₹${room.r_price}/night)</option>`;
+                });
+                document.getElementById('room-select').innerHTML = options;
+            });
+    }
+    
+    function showPaymentAmount() {
+        const selectElement = document.getElementById('reservation-select');
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        
+        if (!selectedOption.value) {
+            document.getElementById('display_amount').textContent = '₹ 0';
+            document.getElementById('hidden_reservation_id').value = '';
+            document.getElementById('hidden_amount').value = '';
+            return;
+        }
+        
+        const reservationId = selectedOption.value;
+        const checkin = new Date(selectedOption.getAttribute('data-checkin'));
+        const checkout = new Date(selectedOption.getAttribute('data-checkout'));
+        
+        const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+        
+        fetch(`/api/reservation-details/${reservationId}`)
+            .then(response => response.json())
+            .then(data => {
+                const roomPrice = data.r_price;
+                const totalAmount = nights * roomPrice;
+                
+                document.getElementById('display_amount').textContent = '₹ ' + totalAmount.toLocaleString('en-IN');
+                document.getElementById('hidden_reservation_id').value = reservationId;
+                document.getElementById('hidden_amount').value = totalAmount;
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                document.getElementById('display_amount').textContent = '₹ Error';
+            });
+    }
+    
+    // Initialize dates on page load
+    window.addEventListener('load', function() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const todayStr = today.getFullYear() + '-' + 
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(today.getDate()).padStart(2, '0');
+        
+        const tomorrowStr = tomorrow.getFullYear() + '-' + 
+                           String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(tomorrow.getDate()).padStart(2, '0');
+        
+        document.getElementById('checkin_date').setAttribute('min', todayStr);
+        document.getElementById('checkin_date').value = todayStr;
+        
+        document.getElementById('checkout_date').setAttribute('min', tomorrowStr);
+        document.getElementById('checkout_date').value = tomorrowStr;
+        
+        document.getElementById('checkin_date').addEventListener('change', function() {
+            const checkinDate = new Date(this.value);
+            checkinDate.setDate(checkinDate.getDate() + 1);
+            
+            const checkoutMin = checkinDate.getFullYear() + '-' + 
+                               String(checkinDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                               String(checkinDate.getDate()).padStart(2, '0');
+            
+            document.getElementById('checkout_date').setAttribute('min', checkoutMin);
+            document.getElementById('checkout_date').value = checkoutMin;
+        });
+    });
+</script>
+{% endblock %}
